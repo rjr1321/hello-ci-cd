@@ -64,27 +64,19 @@ jobs:
           cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max
 
       # Deploy con Deploy Hook (simple)
-      - name: Deploy to Render via Deploy Hook (imgURL = sha tag)
+      - name: Deploy to Render (Git-backed service)
         shell: bash
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
           set -euo pipefail
           if [ -z "${RENDER_DEPLOY_HOOK:-}" ]; then
-            echo "RENDER_DEPLOY_HOOK no está definido. Omitiendo deploy por Hook."
+            echo "RENDER_DEPLOY_HOOK no está definido. Omitiendo deploy."
             exit 0
           fi
-
-          IMG_URL="docker.io/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.sha_tag }}"
-          HOOK="${RENDER_DEPLOY_HOOK}"
-
-          # Detectar ? o & para adjuntar imgURL
-          if [[ "$HOOK" == *"?"* ]]; then
-            URL="${HOOK}&imgURL=${IMG_URL}"
-          else
-            URL="${HOOK}?imgURL=${IMG_URL}"
-          fi
-
-          echo "Trigger Deploy Hook → ${URL}"
-          curl -fsS -X POST "$URL"
+          # Para servicios conectados a Git, basta un POST/GET al hook:
+          # Render hará el build desde el repo/branch configurado
+          curl -fsS -X POST "${RENDER_DEPLOY_HOOK}"
 
       # Deploy con API (opcional)
       - name: Deploy to Render via API (imageUrl)
