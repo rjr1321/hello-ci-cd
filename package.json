@@ -1,0 +1,17 @@
+{
+  "name": "hello-ci-cd",
+  "version": "1.0.0",
+  "description": "Hello World web app with CI/CD (Node.js + Docker + GitHub Actions + Render)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "jest --runInBand"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.1.1"
+  }
+}
